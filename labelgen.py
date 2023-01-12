@@ -11,6 +11,8 @@ parser.add_argument('--qr-path',
                     help='the path to an image of a 2d QR code to include in the label')
 parser.add_argument('--barcode-path',
                     help='the path to an image of a 1D barcode to include in the label')
+parser.add_argument('--label',
+                    help='Text to write on the label')
 parser.add_argument('--output',
                     help='the path to write the final image to')
 
@@ -53,5 +55,20 @@ if args.barcode_path:
 	offset = (x, y)
 	background.paste(barcode, offset)
 
+
+if args.label:
+	draw = ImageDraw.Draw(background)
+	# font = ImageFont.truetype(<font-file>, <font-size>)
+	font = ImageFont.truetype("/usr/share/fonts/truetype/open-sans/OpenSans-Bold.ttf", 128)
+	font_w, font_h = draw.textsize(args.label,font=font)
+
+	w=(bg_w-font_w)/2
+	if args.qr_path:
+		w += qr_w/2
+	
+	h=(bg_h-font_h)/2
+	if args.barcode_path:
+		h -= bcode_h/2
+	draw.text((w,h), args.label, fill="black",font=font)
 if args.output:
 	background.save(args.output)
