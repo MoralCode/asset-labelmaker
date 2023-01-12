@@ -39,5 +39,19 @@ if args.qr_path:
 	background.paste(qr, offset)
 
 
+if args.barcode_path:
+	barcode = Image.open(args.barcode_path, 'r')
+	bcode_w, bcode_h = barcode.size
+	barcode = barcode.resize((bg_w - (padding*2), bcode_h), resample=Image.Resampling.NEAREST)
+	bcode_w, bcode_h = barcode.size
+
+	# centered horizontally
+	x = (bg_w - bcode_w) // 2
+	#end vertically
+	y = (bg_h - bcode_h)- padding
+
+	offset = (x, y)
+	background.paste(barcode, offset)
+
 if args.output:
 	background.save(args.output)
