@@ -2,5 +2,5 @@
 
 for i in {00001..00050}
 do
-	ASSETID="E$i" make default
+	ASSETID="E$i" make default &
 done
