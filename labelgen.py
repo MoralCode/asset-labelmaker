@@ -1,5 +1,7 @@
 import argparse
 from PIL import Image
+from PIL import ImageFont
+from PIL import ImageDraw 
 
 # Generate a single asset label for an erg given the QR code and the barcode
 #  
