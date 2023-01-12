@@ -17,7 +17,7 @@ parser.add_argument('--output',
 args = parser.parse_args()
 
 
-background = Image.new('RGBA', (1440, 900), (255, 255, 255, 255))
+background = Image.new('RGBA', (800, 266), (255, 255, 255, 255))
 bg_w, bg_h = background.size
 
 if args.qr_path:
