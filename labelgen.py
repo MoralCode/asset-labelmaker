@@ -19,7 +19,7 @@ args = parser.parse_args()
 
 background = Image.new('RGBA', (800, 266), (255, 255, 255, 255))
 bg_w, bg_h = background.size
-padding = 10
+padding = 5
 
 if args.qr_path:
 	qr = Image.open(args.qr_path, 'r')
