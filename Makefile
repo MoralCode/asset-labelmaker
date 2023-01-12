@@ -1,8 +1,8 @@
 .PHONY: default
 # ASSETID=
-BARCODERAWTMP = "barcode.eps"
-BARCODETMP = "barcode.png"
-QRTMP = "qrcode.png"
+BARCODERAWTMP = "barcode$(ASSETID).eps"
+BARCODETMP = "barcode$(ASSETID).png"
+QRTMP = "qrcode$(ASSETID).png"
 OUTPUT = "label-$(ASSETID).png"
 WIDTH = 790
 
