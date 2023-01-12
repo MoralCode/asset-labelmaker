@@ -19,18 +19,24 @@ args = parser.parse_args()
 
 background = Image.new('RGBA', (800, 266), (255, 255, 255, 255))
 bg_w, bg_h = background.size
+padding = 10
 
 if args.qr_path:
 	qr = Image.open(args.qr_path, 'r')
+	qr_height_factor = .8
+	qr_size = int(qr_height_factor*bg_h)
+	qr = qr.resize((qr_size,qr_size))
 	qr_w, qr_h = qr.size
 
-	# centered
-	offset = ((bg_w - qr_w) // 2, (bg_h - qr_h) // 2)
+	# centered horizontally
+	# x = (bg_w - qr_w) // 2
+	#centered vertically
+	# y = (bg_h - qr_h) // 2
+
+	x = y = padding
+
+	offset = (x, y)
 	background.paste(qr, offset)
-
-
-
-
 
 
 if args.output:
