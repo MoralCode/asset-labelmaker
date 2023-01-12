@@ -20,8 +20,8 @@ args = parser.parse_args()
 background = Image.new('RGBA', (1440, 900), (255, 255, 255, 255))
 bg_w, bg_h = background.size
 
-if args.QR:
-	qr = Image.open('/path/to/file', 'r')
+if args.qr_path:
+	qr = Image.open(args.qr_path, 'r')
 	qr_w, qr_h = qr.size
 
 	# centered
