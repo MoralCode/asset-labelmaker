@@ -1,4 +1,4 @@
-# LabelGen
+# Asset LabelMaker
 
 This is a quick script i threw together to generate Snipe-IT Asset labels in a way that was independent of any particular installation or domain name. The barcodes and QR codes only encode the asset tag value itself.
 
@@ -31,7 +31,9 @@ This essentially just a slightly more formal way to run the series of bash comma
 You need to supply an `ASSETID` environment variable to tell it the asset tag to generate everything for.
 
 `make qr` will create a QR code as a PNG image
+
 `make barcode` makes a Code 128 barcode as a PNG image
+
 `make` (or `make default`) makes a whole label with both barcode types and also uses the python script to assemble it. It also cleans up the temporary barcode files left by the barcode generation.
 
 ### The bash script
