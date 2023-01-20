@@ -41,7 +41,7 @@ if args.qr_path:
 	#centered vertically
 	# y = (bg_h - qr_h) // 2
 
-	x = y = padding
+	x = y = 0 #padding
 
 	offset = (x, y)
 	background.paste(qr, offset)
