@@ -4,10 +4,10 @@ BARCODERAWTMP = "barcode$(ASSETID).eps"
 BARCODETMP = "barcode$(ASSETID).png"
 QRTMP = "qrcode$(ASSETID).png"
 OUTPUT = "label-$(ASSETID).png"
-WIDTH = 790 # this is a bit of a hack to generate barcodes closer in size to the label itself to prevent issues when scaling the barcode. its value is the width of the label that the python script generates minus two times the padding value (to give it some space on the left and right)
-
+# this is a bit of a hack to generate barcodes closer in size to the label itself to prevent issues when scaling the barcode. its value is the width of the label that the python script generates minus two times the padding value (to give it some space on the left and right)
+BARCODE_WIDTH = 865
 barcode:
-	barcode -o $(BARCODERAWTMP) -b $(ASSETID) -n -e "128" -g "$(WIDTH)x50" -E
+	barcode -o $(BARCODERAWTMP) -b $(ASSETID) -n -e "128" -g "$(BARCODE_WIDTH)x50" -E
 	convert $(BARCODERAWTMP) -colorspace RGB -background white -flatten $(BARCODETMP)
 	rm $(BARCODERAWTMP)
 
