@@ -15,9 +15,9 @@ parser.add_argument('--barcode-path',
                     help='the path to an image of a 1D barcode to include in the label')
 parser.add_argument('--label',
                     help='Text to write on the label')
-parser.add_argument('--width', default=800,
+parser.add_argument('--width', default=800, type=int,
                     help='label width')
-parser.add_argument('--height', default=266,
+parser.add_argument('--height', default=266, type=int,
                     help='label height')
 parser.add_argument('--output',
                     help='the path to write the final image to')
