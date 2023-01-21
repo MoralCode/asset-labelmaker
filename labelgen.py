@@ -25,6 +25,8 @@ parser.add_argument('--width', default=800, type=int,
                     help='label width')
 parser.add_argument('--height', default=266, type=int,
                     help='label height')
+parser.add_argument('--property',
+                    help='property identification label')
 parser.add_argument('--output',
                     help='the path to write the final image to')
 
@@ -86,5 +88,13 @@ if args.label:
 	if args.barcode_path:
 		h -= bcode_h/2
 	draw.text((w,h), args.label, fill="black",font=font)
+if args.property:
+	draw = ImageDraw.Draw(background)
+
+	alphafont = ImageFont.truetype("/usr/share/fonts/truetype/liberation/LiberationMono-Bold.ttf", 48)
+	alpha_w, alpha_h = draw.textsize(args.property,font=alphafont)
+
+	draw.text((int((bg_w-alpha_w)/2), 430), args.property, fill="black",font=alphafont)
+
 if args.output:
 	background.save(args.output)
