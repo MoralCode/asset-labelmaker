@@ -47,9 +47,13 @@ if args.qr_path:
 	#centered vertically
 	# y = (bg_h - qr_h) // 2
 
-	x = y = 0 #padding
+	qr_x = 0 #padding 
+	qr_y = 50 # upper vertically
+	# qr_y = bg_h - qr_h # lower vertically
+	# qr_y = int((bg_h - qr_h)/2) # centered vertically
 
-	offset = (x, y)
+
+	offset = (qr_x, qr_y)
 	background.paste(qr, offset)
 
 
@@ -60,11 +64,11 @@ if args.barcode_path:
 	bcode_w, bcode_h = barcode.size
 
 	# centered horizontally
-	x = (bg_w - bcode_w) // 2
+	bcode_x = (bg_w - bcode_w) // 2
 	#end vertically
-	y = (bg_h - bcode_h)- padding
+	bcode_y = (bg_h - bcode_h)- padding
 
-	offset = (x, y)
+	offset = (bcode_x, bcode_y)
 	background.paste(barcode, offset)
 
 
