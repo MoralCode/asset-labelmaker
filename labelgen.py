@@ -7,6 +7,12 @@ from PIL import ImageDraw
 #  
 
 
+# https://stackoverflow.com/a/430665/
+def splitAlphaAndNumeric(s):
+    head = s.rstrip('0123456789')
+    tail = s[len(head):]
+    return head, tail
+
 
 parser = argparse.ArgumentParser(description='Generate asset labels for an Erg')
 parser.add_argument('--qr-path',
