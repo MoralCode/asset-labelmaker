@@ -136,7 +136,7 @@ if args.label:
 	
 	# draw.text((w,h), lines[1], fill="black",font=numfont)
 
-if args.property:
+if config.getString("PropertyLabelText") != "":
 	draw = ImageDraw.Draw(background)
 
 	alphafont = ImageFont.truetype("/usr/share/fonts/truetype/liberation/LiberationMono-Bold.ttf", 48)
