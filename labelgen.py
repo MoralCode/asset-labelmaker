@@ -59,8 +59,8 @@ if args.qr_path:
 	# qr_y = int((bg_h - qr_h)/2) # centered vertically
 
 
-	offset = (qr_x, qr_y)
-	background.paste(qr, offset)
+	qr_offset = (qr_x, qr_y)
+	background.paste(qr, qr_offset)
 
 
 if args.barcode_path:
@@ -74,8 +74,8 @@ if args.barcode_path:
 	#end vertically
 	bcode_y = (bg_h - bcode_h) + config.getInteger("BarcodeLowerVerticalPaddingFactor") * padding
 
-	offset = (bcode_x, bcode_y)
-	background.paste(barcode, offset)
+	bcode_offset = (bcode_x, bcode_y)
+	background.paste(barcode, bcode_offset)
 
 
 if args.label:
