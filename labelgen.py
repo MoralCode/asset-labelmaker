@@ -22,6 +22,10 @@ parser.add_argument('--barcode-path',
                     help='the path to an image of a 1D barcode to include in the label')
 parser.add_argument('--label',
                     help='Text to write on the label')
+parser.add_argument('--configpath', default="config.ini",
+                    help='path to config ini file')		
+parser.add_argument('--configsection', default="default",
+                    help='name of the config section to use')			
 parser.add_argument('--output',
                     help='the path to write the final image to')
 
