@@ -86,8 +86,8 @@ if args.label:
 	lines = splitAlphaAndNumeric(text)
 
 	draw = ImageDraw.Draw(background)
-	alphafont = ImageFont.truetype("/usr/share/fonts/truetype/liberation/LiberationMono-Bold.ttf", config.getInteger("HumanLabelAlphaFontSize"))
-	numfont = ImageFont.truetype("/usr/share/fonts/truetype/liberation/LiberationMono-Bold.ttf", config.getInteger("HumanLabelNumericFontSize"))
+	alphafont = ImageFont.truetype(config.getString("HumanLabelAlphaFont"), config.getInteger("HumanLabelAlphaFontSize"))
+	numfont = ImageFont.truetype(config.getString("HumanLabelNumericFont"), config.getInteger("HumanLabelNumericFontSize"))
 
 
 	start_w = 0
@@ -141,7 +141,7 @@ if args.label:
 if config.getString("PropertyLabelText") != "":
 	draw = ImageDraw.Draw(background)
 
-	propertyfont = ImageFont.truetype("/usr/share/fonts/truetype/liberation/LiberationMono-Bold.ttf", config.getInteger("PropertyLabelAlphaFontSize"))
+	propertyfont = ImageFont.truetype(config.getString("PropertyLabelFont"), config.getInteger("PropertyLabelFontSize"))
 	prop_alpha_w, prop_alpha_h = draw.textsize(config.getString("PropertyLabelText"),font=propertyfont)
 
 	draw.text((int((bg_w - prop_alpha_w)/2 + config.getInteger("PropertyLabelHorizontalOffsetFromCenter")), config.getInteger("PropertyLabelVerticalPosition")), config.getString("PropertyLabelText"), fill="black",font=propertyfont)
