@@ -2,7 +2,7 @@
 BARCODERAWTMP = "barcode$(ASSETID).eps"
 BARCODETMP = "barcode$(ASSETID).png"
 QRTMP = "qrcode$(ASSETID).png"
-OUTPUT = "label-$(ASSETID).png"
+OUTPUT = "$(OUTPUTDIR)label-$(ASSETID).png"
 PROPERTY_LABEL = "Property of RIT Rowing"
 # this is a bit of a hack to generate barcodes closer in size to the label itself to prevent issues when scaling the barcode. its value is the width of the label that the python script generates minus two times the padding value (to give it some space on the left and right)
 BARCODE_WIDTH = 845
