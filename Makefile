@@ -25,6 +25,13 @@ big: qr barcode
 	rm $(BARCODETMP) $(QRTMP)
 
 
+small: HEIGHT=310
+small: BARCODE_HEIGHT=60
+small: qr barcode
+	pipenv run python3 ./labelgen.py --qr-path $(QRTMP) --barcode-path $(BARCODETMP) --label $(ASSETID) --width "$(WIDTH)" --height "$(HEIGHT)" --property $(PROPERTY_LABEL) --output $(OUTPUT)
+	rm $(BARCODETMP) $(QRTMP)
+
+
 default: big
 
 clean:
