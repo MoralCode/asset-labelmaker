@@ -98,7 +98,7 @@ if args.label:
 
 
 	if args.qr_path:
-		start_w = qr_w + qr_x - config.getInteger("HumanLabelHorizontalOffset") 
+		start_w = qr_w + qr_x + config.getInteger("HumanLabelHorizontalOffset") 
 		start_h = qr_y + config.getInteger("HumanLabelVerticalOffset") #+ int(padding/2)#+ qr_y
 		#int((bg_h-bcode_h-padding-alpha_h-num_h)/2)
 	# draw text
@@ -109,13 +109,13 @@ if args.label:
 
 	# draw number
 	if config.getString("HumanLabelTextStacking") == "horizontal":
-		offset = (start_w + alpha_w+(config.getInteger("HumanLabelNumberPaddingFromAlphaFactor") * padding), start_h)
+		labelnumoffset = (start_w + alpha_w+(config.getInteger("HumanLabelNumberPaddingFromAlphaFactor") * padding), start_h + config.getInteger("HumanLabelNumberVerticalOffsetFromAlpha"))
 
 	elif config.getString("HumanLabelTextStacking") == "vertical":
-		offset = (start_w, start_h + alpha_h)
+		labelnumoffset = (start_w, start_h + alpha_h)
 		
 
-	draw.text(offset, lines[1], fill="black",font=numfont)
+	draw.text(labelnumoffset, lines[1], fill="black",font=numfont)
 
 	# for line in lines:
 	# 	width, height = draw.textsize(line,font=font)
