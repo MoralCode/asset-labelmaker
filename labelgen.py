@@ -2,7 +2,7 @@ import argparse
 from PIL import Image
 from PIL import ImageFont
 from PIL import ImageDraw 
-import ConfigParser
+from configfinder import ConfigFinder
 
 # Generate a single asset label for an erg given the QR code and the barcode
 #  
@@ -31,14 +31,19 @@ parser.add_argument('--output',
 
 args = parser.parse_args()
 
+config = ConfigFinder(args.configpath, args.configsection)
 
-background = Image.new('RGBA', (args.width, args.height), (255, 255, 255, 255))
+print(config.getFloat("LabelWidth"))
+# print(config.getInteger("test"))
+
+background = Image.new('RGBA', (config.getInteger("LabelWidth"), config.getInteger("Labelheight")), (255, 255, 255, 255))
 bg_w, bg_h = background.size
-padding = int(.025*args.width)
+# padding = int(.025*config.getInteger("LabelWidth"))
+padding = config.getInteger("LabelPadding")
 
 if args.qr_path:
 	qr = Image.open(args.qr_path, 'r')
-	qr_height_factor = .55
+	qr_height_factor = config.getFloat("QRHeightFactor")
 	qr_size = int(qr_height_factor*bg_h)
 	qr = qr.resize((qr_size,qr_size))
 	qr_w, qr_h = qr.size
@@ -48,8 +53,8 @@ if args.qr_path:
 	#centered vertically
 	# y = (bg_h - qr_h) // 2
 
-	qr_x = 0 #padding 
-	qr_y = 50 # upper vertically
+	qr_x = config.getInteger("QRHorizontalOffset") #padding 
+	qr_y = config.getInteger("QRVerticalOffset") # upper vertically
 	# qr_y = bg_h - qr_h # lower vertically
 	# qr_y = int((bg_h - qr_h)/2) # centered vertically
 
@@ -67,7 +72,7 @@ if args.barcode_path:
 	# centered horizontally
 	bcode_x = (bg_w - bcode_w) // 2
 	#end vertically
-	bcode_y = (bg_h - bcode_h)- padding
+	bcode_y = (bg_h - bcode_h) + config.getInteger("BarcodeLowerVerticalPaddingFactor") * padding
 
 	offset = (bcode_x, bcode_y)
 	background.paste(barcode, offset)
@@ -81,8 +86,8 @@ if args.label:
 	lines = splitAlphaAndNumeric(text)
 
 	draw = ImageDraw.Draw(background)
-	alphafont = ImageFont.truetype("/usr/share/fonts/truetype/liberation/LiberationMono-Bold.ttf", 64)
-	numfont = ImageFont.truetype("/usr/share/fonts/truetype/liberation/LiberationMono-Bold.ttf", 220)
+	alphafont = ImageFont.truetype("/usr/share/fonts/truetype/liberation/LiberationMono-Bold.ttf", config.getInteger("HumanLabelAlphaFontSize"))
+	numfont = ImageFont.truetype("/usr/share/fonts/truetype/liberation/LiberationMono-Bold.ttf", config.getInteger("HumanLabelNumericFontSize"))
 
 
 	start_w = 0
@@ -93,8 +98,8 @@ if args.label:
 
 
 	if args.qr_path:
-		start_w = qr_w + qr_x - 20
-		start_h = qr_y + 35#+ int(padding/2)#+ qr_y
+		start_w = qr_w + qr_x - config.getInteger("HumanLabelHorizontalOffset") 
+		start_h = qr_y + config.getInteger("HumanLabelVerticalOffset") #+ int(padding/2)#+ qr_y
 		#int((bg_h-bcode_h-padding-alpha_h-num_h)/2)
 	# draw text
 	alpha_w, alpha_h = draw.textsize(lines[0],font=alphafont)
@@ -103,7 +108,12 @@ if args.label:
 	draw.text((start_w, start_h), lines[0], fill="black",font=alphafont)
 
 	# draw number
-	draw.text((start_w, start_h + alpha_h), lines[1], fill="black",font=numfont)
+	if config.getString("HumanLabelTextStacking") == "horizontal":
+		offset = (start_w, start_h + alpha_h)
+	elif config.getString("HumanLabelTextStacking") == "vertical":
+		offset = (start_w + alpha_w+(config.getInteger("HumanLabelNumberPaddingFromAlphaFactor") * padding), start_h)
+
+	draw.text(offset, lines[1], fill="black",font=numfont)
 
 	# for line in lines:
 	# 	width, height = draw.textsize(line,font=font)
@@ -130,9 +140,9 @@ if args.property:
 	draw = ImageDraw.Draw(background)
 
 	alphafont = ImageFont.truetype("/usr/share/fonts/truetype/liberation/LiberationMono-Bold.ttf", 48)
-	alpha_w, alpha_h = draw.textsize(args.property,font=alphafont)
+	prop_alpha_w, prop_alpha_h = draw.textsize(config.getString("PropertyLabelText"),font=alphafont)
 
-	draw.text((int((bg_w-alpha_w)/2), 430), args.property, fill="black",font=alphafont)
+	draw.text((int((bg_w - prop_alpha_w)/2 + config.getInteger("PropertyLabelHorizontalOffsetFromCenter")), config.getInteger("PropertyLabelVerticalPosition")), config.getString("PropertyLabelText"), fill="black",font=alphafont)
 
 if args.output:
 	background.save(args.output)
