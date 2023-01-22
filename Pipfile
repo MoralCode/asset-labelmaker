@@ -5,6 +5,7 @@ name = "pypi"
 
 [packages]
 pillow = "*"
+configparser = "*"
 
 [dev-packages]
 
