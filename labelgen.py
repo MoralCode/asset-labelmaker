@@ -98,8 +98,18 @@ if args.label:
 
 
 	if args.qr_path:
-		start_w = qr_w + qr_x + config.getInteger("HumanLabelHorizontalOffset") 
-		start_h = qr_y + config.getInteger("HumanLabelVerticalOffset") #+ int(padding/2)#+ qr_y
+		qr_x_offset = 0
+		qr_y_offset = 0
+
+		if config.getString("HumanLabelPositionToQR") == "beside":
+			qr_x_offset = qr_w + qr_x
+			qr_y_offset = qr_y
+		elif config.getString("HumanLabelPositionToQR") == "below":
+			qr_x_offset = qr_x
+			qr_y_offset = qr_h + qr_y
+
+		start_w = qr_x_offset + config.getInteger("HumanLabelHorizontalOffset") 
+		start_h = qr_y_offset + config.getInteger("HumanLabelVerticalOffset") #+ int(padding/2)#+ qr_y
 		#int((bg_h-bcode_h-padding-alpha_h-num_h)/2)
 	# draw text
 	alpha_w, alpha_h = draw.textsize(lines[0],font=alphafont)
