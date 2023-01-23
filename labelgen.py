@@ -113,7 +113,7 @@ if args.label:
 		labelnumoffset = (start_w + alpha_w+(config.getInteger("HumanLabelNumberPaddingFromAlphaFactor") * padding), start_h + config.getInteger("HumanLabelNumberVerticalOffsetFromAlpha"))
 
 	elif config.getString("HumanLabelTextStacking") == "vertical":
-		labelnumoffset = (start_w, start_h + alpha_h)
+		labelnumoffset = (start_w, start_h + alpha_h + config.getInteger("HumanLabelNumberVerticalOffsetFromAlpha"))
 		
 
 	draw.text(labelnumoffset, lines[1], fill="black",font=numfont)
