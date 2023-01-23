@@ -108,6 +108,7 @@ if args.label:
 	draw.text((start_w, start_h), lines[0], fill="black",font=alphafont)
 
 	# draw number
+	labelnumoffset = (start_w, start_h)
 	if config.getString("HumanLabelTextStacking") == "horizontal":
 		labelnumoffset = (start_w + alpha_w+(config.getInteger("HumanLabelNumberPaddingFromAlphaFactor") * padding), start_h + config.getInteger("HumanLabelNumberVerticalOffsetFromAlpha"))
 
