@@ -20,14 +20,12 @@ qr:
 
 #https://stackoverflow.com/questions/15229833/set-makefile-variable-inside-target
 
-big: HEIGHT=625
 big: BARCODE_HEIGHT=100
 big: qr barcode
 	pipenv run python3 ./labelgen.py --qr-path $(QRTMP) --barcode-path $(BARCODETMP) --label $(ASSETID) --configsection Full --output $(OUTPUT)
 	rm $(BARCODETMP) $(QRTMP)
 
 
-small: HEIGHT=310
 small: BARCODE_HEIGHT=60
 small: qr barcode
 	pipenv run python3 ./labelgen.py --qr-path $(QRTMP) --barcode-path $(BARCODETMP) --label $(ASSETID) --configsection Half --output $(OUTPUT)
