@@ -14,6 +14,23 @@ def splitAlphaAndNumeric(s):
     tail = s[len(head):]
     return head, tail
 
+def stringToAngle(directionStr):
+	"""convert a string cardinal direction into a rotation in degrees counterclockwise for  Pillow
+	Returns:
+		int: number of degrees coutnerclockwise
+	"""
+    
+	if directionStr.lower() == "north":
+		return 0
+	elif directionStr.lower() == "east":
+		return 270
+	elif directionStr.lower() == "south":
+		return 180
+	elif directionStr.lower() == "west":
+		return 90
+	else:
+		return 0 
+
 
 parser = argparse.ArgumentParser(description='Generate asset labels for an Erg')
 parser.add_argument('--qr-path',
@@ -158,4 +175,7 @@ if config.getString("PropertyLabelText") != "":
 	draw.text((int((bg_w - prop_alpha_w)/2 + config.getInteger("PropertyLabelHorizontalOffsetFromCenter")), config.getInteger("PropertyLabelVerticalPosition")), config.getString("PropertyLabelText"), fill="black",font=propertyfont)
 
 if args.output:
-	background.save(args.output)
+	angle = stringToAngle(config.getString("LabelRoation"))
+	rotated = background.rotate(angle, expand=True)
+
+	rotated.save(args.output)
