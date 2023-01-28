@@ -26,3 +26,8 @@ class ConfigFinder:
 			return float(val)
 		else:
 			return val
+
+	def getBoolean(self, key):
+		val = self.getString(key, default=None)
+		val = val.lower()
+		return val == "true"
