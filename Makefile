@@ -31,6 +31,10 @@ small: qr barcode
 	pipenv run python3 ./labelgen.py --qr-path $(QRTMP) --barcode-path $(BARCODETMP) --label $(ASSETID) --configsection Half --output $(OUTPUT)
 	rm $(BARCODETMP) $(QRTMP)
 
+big-virt: BARCODE_HEIGHT=100
+big-virt: qr barcode
+	pipenv run python3 ./labelgen.py --qr-path $(QRTMP) --barcode-path $(BARCODETMP) --label $(ASSETID) --configsection FullVertical --output $(OUTPUT)
+	rm $(BARCODETMP) $(QRTMP)
 
 default: big
 
