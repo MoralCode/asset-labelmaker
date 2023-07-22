@@ -3,9 +3,8 @@ from PIL import Image
 from PIL import ImageFont
 from PIL import ImageDraw 
 from configfinder import ConfigFinder
-
-# Generate a single asset label for an erg given the QR code and the barcode
-#  
+import qrcode
+# Generate a single asset label for an erg given a path to a QR code and barcode
 
 
 # https://stackoverflow.com/a/430665/
@@ -58,26 +57,36 @@ bg_w, bg_h = background.size
 # padding = int(.025*config.getInteger("LabelWidth"))
 padding = config.getInteger("LabelPadding")
 
-if args.qr_path:
-	qr = Image.open(args.qr_path, 'r')
+# build QR:
+
+def build_qr(asset_tag, config):
+	qr = None
+	if args.qr_path:
+		qr = Image.open(args.qr_path, 'r')
+	else:
+		qr = qrcode.make(asset_tag)
 	qr_height_factor = config.getFloat("QRHeightFactor")
 	qr_size = int(qr_height_factor*bg_h)
 	qr = qr.resize((qr_size,qr_size))
-	qr_w, qr_h = qr.size
-
-	# centered horizontally
-	# x = (bg_w - qr_w) // 2
-	#centered vertically
-	# y = (bg_h - qr_h) // 2
-
-	qr_x = config.getInteger("QRHorizontalOffset") #padding 
-	qr_y = config.getInteger("QRVerticalOffset") # upper vertically
-	# qr_y = bg_h - qr_h # lower vertically
-	# qr_y = int((bg_h - qr_h)/2) # centered vertically
+	return qr
 
 
-	qr_offset = (qr_x, qr_y)
-	background.paste(qr, qr_offset)
+qr = build_qr(args.label, config)
+qr_w, qr_h = qr.size
+
+# centered horizontally
+# x = (bg_w - qr_w) // 2
+#centered vertically
+# y = (bg_h - qr_h) // 2
+
+qr_x = config.getInteger("QRHorizontalOffset") #padding 
+qr_y = config.getInteger("QRVerticalOffset") # upper vertically
+# qr_y = bg_h - qr_h # lower vertically
+# qr_y = int((bg_h - qr_h)/2) # centered vertically
+
+
+qr_offset = (qr_x, qr_y)
+background.paste(qr, qr_offset)
 
 
 if args.barcode_path:
