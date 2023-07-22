@@ -19,7 +19,7 @@ function make_batch {
 	(
 	for id in $(seq -w $1 $2); do 
 	((i=i%N)); ((i++==0)) && wait
-		ASSETID="$PREFIX$id" OUTPUTDIR="$OUTPUTDIR" make $STYLE &
+		pipenv run python3 ./labelgen.py --label "$PREFIX$id" --qr --barcode --configsection "$STYLE" --output "$OUTPUTDIR$PREFIX$id.png" &
 	done
 	wait
 	echo "Done."
@@ -29,3 +29,6 @@ function make_batch {
 }
 
 mkdir -p "$OUTPUTDIR"
+
+PREFIX="DEMO"
+make_batch 0001 0015 Full
