@@ -139,7 +139,7 @@ if args.label:
 	# num_w, num_h = draw.textsize(lines[0],font=numfont)
 
 
-	if args.qr_path:
+	if args.qr:
 		qr_x_offset = 0
 		qr_y_offset = 0
 
