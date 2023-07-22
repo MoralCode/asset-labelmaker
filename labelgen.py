@@ -114,7 +114,7 @@ if args.barcode:
 	# centered horizontally
 	bcode_x = (bg_w - bcode_w) // 2
 	#end vertically
-	bcode_y = (bg_h - bcode_h) + config.getInteger("BarcodeLowerVerticalPaddingFactor") * padding
+	bcode_y = (bg_h - bcode_h) + config.getInteger("BarcodeBottomPaddingFactor") * padding
 
 	bcode_offset = (bcode_x, bcode_y)
 	background.paste(barcode, bcode_offset)
