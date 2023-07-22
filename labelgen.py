@@ -4,6 +4,8 @@ from PIL import ImageFont
 from PIL import ImageDraw 
 from configfinder import ConfigFinder
 import qrcode
+from pubcode import Code128
+
 # Generate a single asset label for an erg given a path to a QR code and barcode
 
 
@@ -89,19 +91,31 @@ qr_offset = (qr_x, qr_y)
 background.paste(qr, qr_offset)
 
 
-if args.barcode_path:
-	barcode = Image.open(args.barcode_path, 'r')
-	bcode_w, bcode_h = barcode.size
-	barcode = barcode.resize((bg_w - (padding*2), bcode_h), resample=Image.Resampling.NEAREST)
-	bcode_w, bcode_h = barcode.size
 
-	# centered horizontally
-	bcode_x = (bg_w - bcode_w) // 2
-	#end vertically
-	bcode_y = (bg_h - bcode_h) + config.getInteger("BarcodeLowerVerticalPaddingFactor") * padding
+def build_barcode(asset_tag, config):
+	barcode = None
+	if args.barcode_path:
+		barcode = Image.open(args.barcode_path, 'r')
 
-	bcode_offset = (bcode_x, bcode_y)
-	background.paste(barcode, bcode_offset)
+	else:
+		height = 100
+		barcode = Code128(args.label, charset='B')
+		barcode.quiet_zone = 1 #num of modules
+		mod_width = 10
+		vert_border_size = 0#barcode.quiet_zone * mod_width
+		barcode = barcode.image(height=height-(vert_border_size * 2), module_width=mod_width, add_quiet_zone=True)
+
+	return barcode
+
+barcode = build_barcode(args.label, config)
+bcode_w, bcode_h = barcode.size
+# centered horizontally
+bcode_x = (bg_w - bcode_w) // 2
+#end vertically
+bcode_y = (bg_h - bcode_h) + config.getInteger("BarcodeLowerVerticalPaddingFactor") * padding
+
+bcode_offset = (bcode_x, bcode_y)
+background.paste(barcode, bcode_offset)
 
 
 if args.label:
