@@ -96,7 +96,7 @@ if args.qr:
 
 def build_barcode(asset_tag, config):
 	
-	height = 100
+	height = config.getInteger("BarcodeHeight")
 	barcode = Code128(args.label, charset='B')
 	barcode.quiet_zone = 1 #num of modules
 	mod_width = 10
