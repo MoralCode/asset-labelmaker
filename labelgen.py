@@ -34,10 +34,10 @@ def stringToAngle(directionStr):
 
 
 parser = argparse.ArgumentParser(description='Generate asset labels for an Erg')
-parser.add_argument('--qr-path',
-                    help='the path to an image of a 2d QR code to include in the label')
-parser.add_argument('--barcode-path',
-                    help='the path to an image of a 1D barcode to include in the label')
+parser.add_argument('--qr', action="store_true",
+                    help='whether or not to include a QR code in the generated label')
+parser.add_argument('--barcode', action="store_true",
+                    help='whether or not to include a Code128B barcode in the generated label')
 parser.add_argument('--label',
                     help='Text to write on the label')
 parser.add_argument('--configpath', default="config.ini",
@@ -62,60 +62,58 @@ padding = config.getInteger("LabelPadding")
 # build QR:
 
 def build_qr(asset_tag, config):
-	qr = None
-	if args.qr_path:
-		qr = Image.open(args.qr_path, 'r')
-	else:
-		qr = qrcode.make(asset_tag)
+	qr = qrcode.make(asset_tag)
 	qr_height_factor = config.getFloat("QRHeightFactor")
 	qr_size = int(qr_height_factor*bg_h)
 	qr = qr.resize((qr_size,qr_size))
 	return qr
 
 
-qr = build_qr(args.label, config)
-qr_w, qr_h = qr.size
 
-# centered horizontally
-# x = (bg_w - qr_w) // 2
-#centered vertically
-# y = (bg_h - qr_h) // 2
+if args.qr:
+	qr = build_qr(args.label, config)
+	qr_w, qr_h = qr.size
 
-qr_x = config.getInteger("QRHorizontalOffset") #padding 
-qr_y = config.getInteger("QRVerticalOffset") # upper vertically
-# qr_y = bg_h - qr_h # lower vertically
-# qr_y = int((bg_h - qr_h)/2) # centered vertically
+	# centered horizontally
+	# x = (bg_w - qr_w) // 2
+	#centered vertically
+	# y = (bg_h - qr_h) // 2
+
+	qr_x = config.getInteger("QRHorizontalOffset") #padding 
+	qr_y = config.getInteger("QRVerticalOffset") # upper vertically
+	# qr_y = bg_h - qr_h # lower vertically
+	# qr_y = int((bg_h - qr_h)/2) # centered vertically
 
 
-qr_offset = (qr_x, qr_y)
-background.paste(qr, qr_offset)
+	qr_offset = (qr_x, qr_y)
+	background.paste(qr, qr_offset)
 
 
 
 def build_barcode(asset_tag, config):
-	barcode = None
-	if args.barcode_path:
-		barcode = Image.open(args.barcode_path, 'r')
-
-	else:
-		height = 100
-		barcode = Code128(args.label, charset='B')
-		barcode.quiet_zone = 1 #num of modules
-		mod_width = 10
-		vert_border_size = 0#barcode.quiet_zone * mod_width
-		barcode = barcode.image(height=height-(vert_border_size * 2), module_width=mod_width, add_quiet_zone=True)
-
+	
+	height = 100
+	barcode = Code128(args.label, charset='B')
+	barcode.quiet_zone = 1 #num of modules
+	mod_width = 10
+	vert_border_size = 0#barcode.quiet_zone * mod_width
+	barcode = barcode.image(height=height-(vert_border_size * 2), module_width=mod_width, add_quiet_zone=True)
+	
 	return barcode
 
-barcode = build_barcode(args.label, config)
-bcode_w, bcode_h = barcode.size
-# centered horizontally
-bcode_x = (bg_w - bcode_w) // 2
-#end vertically
-bcode_y = (bg_h - bcode_h) + config.getInteger("BarcodeLowerVerticalPaddingFactor") * padding
+if args.barcode:
+	barcode = build_barcode(args.label, config)
+	bcode_w, bcode_h = barcode.size
+	# barcode = barcode.resize((bg_w - (padding*2), bcode_h), resample=Image.Resampling.NEAREST)
+	# bcode_w, bcode_h = barcode.size
 
-bcode_offset = (bcode_x, bcode_y)
-background.paste(barcode, bcode_offset)
+	# centered horizontally
+	bcode_x = (bg_w - bcode_w) // 2
+	#end vertically
+	bcode_y = (bg_h - bcode_h) + config.getInteger("BarcodeLowerVerticalPaddingFactor") * padding
+
+	bcode_offset = (bcode_x, bcode_y)
+	background.paste(barcode, bcode_offset)
 
 
 if args.label:
