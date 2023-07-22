@@ -3,9 +3,10 @@ from PIL import Image
 from PIL import ImageFont
 from PIL import ImageDraw 
 from configfinder import ConfigFinder
+import qrcode
+from pubcode import Code128
 
-# Generate a single asset label for an erg given the QR code and the barcode
-#  
+# Generate a single asset label for an erg given a path to a QR code and barcode
 
 
 # https://stackoverflow.com/a/430665/
@@ -33,10 +34,12 @@ def stringToAngle(directionStr):
 
 
 parser = argparse.ArgumentParser(description='Generate asset labels for an Erg')
-parser.add_argument('--qr-path',
-                    help='the path to an image of a 2d QR code to include in the label')
-parser.add_argument('--barcode-path',
-                    help='the path to an image of a 1D barcode to include in the label')
+parser.add_argument('--qr', action="store_true",
+                    help='whether or not to include a QR code in the generated label')
+parser.add_argument('--barcode', action="store_true",
+                    help='whether or not to include a Code128B barcode in the generated label')
+parser.add_argument('--asset-tag',
+                    help='data to write to the codes (if different from the label)')
 parser.add_argument('--label',
                     help='Text to write on the label')
 parser.add_argument('--configpath', default="config.ini",
@@ -50,132 +53,153 @@ args = parser.parse_args()
 
 config = ConfigFinder(args.configpath, args.configsection)
 
-print(config.getFloat("LabelWidth"))
-# print(config.getInteger("test"))
-
-background = Image.new('RGBA', (config.getInteger("LabelWidth"), config.getInteger("Labelheight")), (255, 255, 255, 255))
-bg_w, bg_h = background.size
-# padding = int(.025*config.getInteger("LabelWidth"))
-padding = config.getInteger("LabelPadding")
-
-if args.qr_path:
-	qr = Image.open(args.qr_path, 'r')
-	qr_height_factor = config.getFloat("QRHeightFactor")
-	qr_size = int(qr_height_factor*bg_h)
-	qr = qr.resize((qr_size,qr_size))
-	qr_w, qr_h = qr.size
-
-	# centered horizontally
-	# x = (bg_w - qr_w) // 2
-	#centered vertically
-	# y = (bg_h - qr_h) // 2
-
-	qr_x = config.getInteger("QRHorizontalOffset") #padding 
-	qr_y = config.getInteger("QRVerticalOffset") # upper vertically
-	# qr_y = bg_h - qr_h # lower vertically
-	# qr_y = int((bg_h - qr_h)/2) # centered vertically
 
 
-	qr_offset = (qr_x, qr_y)
-	background.paste(qr, qr_offset)
 
 
-if args.barcode_path:
-	barcode = Image.open(args.barcode_path, 'r')
-	bcode_w, bcode_h = barcode.size
-	barcode = barcode.resize((bg_w - (padding*2), bcode_h), resample=Image.Resampling.NEAREST)
-	bcode_w, bcode_h = barcode.size
-
-	# centered horizontally
-	bcode_x = (bg_w - bcode_w) // 2
-	#end vertically
-	bcode_y = (bg_h - bcode_h) + config.getInteger("BarcodeLowerVerticalPaddingFactor") * padding
-
-	bcode_offset = (bcode_x, bcode_y)
-	background.paste(barcode, bcode_offset)
 
 
-if args.label:
 
-	text = args.label
-	# apply special processing for alpha-prefixed numeric asset tags to split it up
-	print(splitAlphaAndNumeric(text))
-	lines = splitAlphaAndNumeric(text)
+class Label():
 
-	draw = ImageDraw.Draw(background)
-	alphafont = ImageFont.truetype(config.getString("HumanLabelAlphaFont"), config.getInteger("HumanLabelAlphaFontSize"))
-	numfont = ImageFont.truetype(config.getString("HumanLabelNumericFont"), config.getInteger("HumanLabelNumericFontSize"))
+	def __init__(self, config, label, asset_tag=None, has_qr=True, has_barcode=True ):
+		self.config = config
+		self.has_qr = has_qr
+		self.has_barcode = has_barcode
+		self.label = label
+		self.asset_tag = asset_tag or label
+		#TODO: what if this is still none???
 
-
-	start_w = 0
-	start_h = 0
+	def _build_qr(self, asset_tag, config, background_height):
+		qr = qrcode.make(asset_tag)
+		qr_height_factor = config.getFloat("QRHeightFactor")
+		qr_size = int(qr_height_factor*background_height)
+		qr = qr.resize((qr_size,qr_size))
+		return qr
 
 	
-	# num_w, num_h = draw.textsize(lines[0],font=numfont)
-
-
-	if args.qr_path:
-		qr_x_offset = 0
-		qr_y_offset = 0
-
-		if config.getString("HumanLabelPositionToQR") == "beside":
-			qr_x_offset = qr_w + qr_x
-			qr_y_offset = qr_y
-		elif config.getString("HumanLabelPositionToQR") == "below":
-			qr_x_offset = qr_x
-			qr_y_offset = qr_h + qr_y
-
-		start_w = qr_x_offset + config.getInteger("HumanLabelHorizontalOffset") 
-		start_h = qr_y_offset + config.getInteger("HumanLabelVerticalOffset") #+ int(padding/2)#+ qr_y
-		#int((bg_h-bcode_h-padding-alpha_h-num_h)/2)
-	# draw text
-	alpha_w, alpha_h = draw.textsize(lines[0],font=alphafont)
-	
-	print(alpha_h)
-	draw.text((start_w, start_h), lines[0], fill="black",font=alphafont)
-
-	# draw number
-	labelnumoffset = (start_w, start_h)
-	if config.getString("HumanLabelTextStacking") == "horizontal":
-		labelnumoffset = (start_w + alpha_w+(config.getInteger("HumanLabelNumberPaddingFromAlphaFactor") * padding), start_h + config.getInteger("HumanLabelNumberVerticalOffsetFromAlpha"))
-
-	elif config.getString("HumanLabelTextStacking") == "vertical":
-		labelnumoffset = (start_w, start_h + alpha_h + config.getInteger("HumanLabelNumberVerticalOffsetFromAlpha"))
+	def _build_barcode(self, asset_tag, config):
 		
+		height = config.getInteger("BarcodeHeight")
+		width = config.getInteger("LabelWidth") - (2* config.getInteger("BarcodeSidePadding"))
+		barcode = Code128(asset_tag, charset='B')
+		barcode.quiet_zone = 1 #num of modules
+		# first  rough pass, try to get close to the right size
+		mod_width = int(width/barcode.width())
+		vert_border_size = 0#barcode.quiet_zone * mod_width
+		barcode = barcode.image(height=height-(vert_border_size * 2), module_width=mod_width, add_quiet_zone=True)
 
-	draw.text(labelnumoffset, lines[1], fill="black",font=numfont)
+		# second final pass, more precisely resize
+		bcode_w, bcode_h = barcode.size
+		barcode = barcode.resize((width, bcode_h), resample=Image.Resampling.NEAREST)
 
-	# for line in lines:
-	# 	width, height = draw.textsize(line,font=font)
-	# 	draw.text(((w - width) / 2, y_text), line, fill="black",font=font)
-	# 	y_text += height
+		return barcode
+
+	def build(self):
+		background = Image.new('RGBA', (self.config.getInteger("LabelWidth"), self.config.getInteger("Labelheight")), (255, 255, 255, 255))
+		bg_w, bg_h = background.size
+		# padding = int(.025*self.config.getInteger("LabelWidth"))
+		padding = self.config.getInteger("LabelPadding")
+
+		if self.has_qr:
+			qr = self._build_qr(self.asset_tag, self.config, bg_h)
+			qr_w, qr_h = qr.size
+			print(qr)
+
+			# centered horizontally
+			# x = (bg_w - qr_w) // 2
+			#centered vertically
+			# y = (bg_h - qr_h) // 2
+
+			qr_x = self.config.getInteger("QRHorizontalOffset") #padding 
+			qr_y = self.config.getInteger("QRVerticalOffset") # upper vertically
+			# qr_y = bg_h - qr_h # lower vertically
+			# qr_y = int((bg_h - qr_h)/2) # centered vertically
+
+
+			qr_offset = (qr_x, qr_y)
+			background.paste(qr, qr_offset)
+
+		if self.has_barcode:
+			barcode = self._build_barcode(self.asset_tag, self.config)
+			bcode_w, bcode_h = barcode.size
+			
+			# centered horizontally
+			bcode_x = (bg_w - bcode_w) // 2
+			#end vertically
+			bcode_y = (bg_h - bcode_h) - self.config.getInteger("BarcodeBottomPaddingFactor") * padding
+
+			bcode_offset = (bcode_x, bcode_y)
+			background.paste(barcode, bcode_offset)
+
+		text = self.label
+		# apply special processing for alpha-prefixed numeric asset tags to split it up
+		print(splitAlphaAndNumeric(text))
+		lines = splitAlphaAndNumeric(text)
+
+		draw = ImageDraw.Draw(background)
+		alphafont = ImageFont.truetype(self.config.getString("HumanLabelAlphaFont"), self.config.getInteger("HumanLabelAlphaFontSize"))
+		numfont = ImageFont.truetype(self.config.getString("HumanLabelNumericFont"), self.config.getInteger("HumanLabelNumericFontSize"))
+
+
+		start_w = 0
+		start_h = 0
+
+		
+		# num_w, num_h = draw.textsize(lines[0],font=numfont)
+
+
+		if self.has_qr:
+			qr_x_offset = 0
+			qr_y_offset = 0
+
+			if self.config.getString("HumanLabelPositionToQR") == "beside":
+				qr_x_offset = qr_w + qr_x
+				qr_y_offset = qr_y
+			elif self.config.getString("HumanLabelPositionToQR") == "below":
+				qr_x_offset = qr_x
+				qr_y_offset = qr_h + qr_y
+
+			start_w = qr_x_offset + self.config.getInteger("HumanLabelHorizontalOffset") 
+			start_h = qr_y_offset + self.config.getInteger("HumanLabelVerticalOffset") #+ int(padding/2)#+ qr_y
+			#int((bg_h-bcode_h-padding-alpha_h-num_h)/2)
+		# draw text
+		alpha_w, alpha_h = draw.textsize(lines[0],font=alphafont)
+		
+		print(alpha_h)
+		draw.text((start_w, start_h), lines[0], fill="black",font=alphafont)
+
+		# draw number
+		labelnumoffset = (start_w, start_h)
+		if self.config.getString("HumanLabelTextStacking") == "horizontal":
+			labelnumoffset = (start_w + alpha_w+(self.config.getInteger("HumanLabelNumberPaddingFromAlphaFactor") * padding), start_h + self.config.getInteger("HumanLabelNumberVerticalOffsetFromAlpha"))
+
+		elif self.config.getString("HumanLabelTextStacking") == "vertical":
+			labelnumoffset = (start_w, start_h + alpha_h + self.config.getInteger("HumanLabelNumberVerticalOffsetFromAlpha"))
+			
+
+		draw.text(labelnumoffset, lines[1], fill="black",font=numfont)
+
+
+		if self.config.getString("PropertyLabelText") != "":
+			draw = ImageDraw.Draw(background)
+
+			propertyfont = ImageFont.truetype(self.config.getString("PropertyLabelFont"), self.config.getInteger("PropertyLabelFontSize"))
+			prop_alpha_w, prop_alpha_h = draw.textsize(self.config.getString("PropertyLabelText"),font=propertyfont)
+
+			draw.text((int((bg_w - prop_alpha_w)/2 + self.config.getInteger("PropertyLabelHorizontalOffsetFromCenter")), self.config.getInteger("PropertyLabelVerticalPosition")), self.config.getString("PropertyLabelText"), fill="black",font=propertyfont)
+		self.background = background
 	
+	def save(self, path):
+		angle = stringToAngle(self.config.getString("LabelRoation"))
+		rotated = self.background.rotate(angle, expand=True)
 
-	# font = ImageFont.truetype(<font-file>, <font-size>)
-	
-	# font_w, font_h = draw.textsize(lines[1],font=numfont)
+		rotated.save(path)
 
-	# w=(bg_w-font_w)/2
-	# if args.qr_path:
-	# 	w += qr_w/2 - 25
-	
-	# h=(bg_h-font_h)/2
-	# if args.barcode_path:
-	# 	h -= bcode_h/2
-	# start_w, start_h = (w,h)
-	
-	# draw.text((w,h), lines[1], fill="black",font=numfont)
+label = Label(config, args.label, asset_tag=args.asset_tag, has_qr=args.qr, has_barcode=args.barcode)
 
-if config.getString("PropertyLabelText") != "":
-	draw = ImageDraw.Draw(background)
-
-	propertyfont = ImageFont.truetype(config.getString("PropertyLabelFont"), config.getInteger("PropertyLabelFontSize"))
-	prop_alpha_w, prop_alpha_h = draw.textsize(config.getString("PropertyLabelText"),font=propertyfont)
-
-	draw.text((int((bg_w - prop_alpha_w)/2 + config.getInteger("PropertyLabelHorizontalOffsetFromCenter")), config.getInteger("PropertyLabelVerticalPosition")), config.getString("PropertyLabelText"), fill="black",font=propertyfont)
+label.build()
 
 if args.output:
-	angle = stringToAngle(config.getString("LabelRoation"))
-	rotated = background.rotate(angle, expand=True)
-
-	rotated.save(args.output)
+	label.save(args.output)
+	

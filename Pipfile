@@ -6,6 +6,8 @@ name = "pypi"
 [packages]
 pillow = "*"
 configparser = "*"
+qrcode = "*"
+pubcode = "*"
 
 [dev-packages]
 
