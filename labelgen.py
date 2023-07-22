@@ -97,20 +97,24 @@ if args.qr:
 def build_barcode(asset_tag, config):
 	
 	height = config.getInteger("BarcodeHeight")
+	width = config.getInteger("LabelWidth") - (2* config.getInteger("BarcodeSidePadding"))
 	barcode = Code128(args.label, charset='B')
 	barcode.quiet_zone = 1 #num of modules
-	mod_width = 10
+	# first  rough pass, try to get close to the right size
+	mod_width = int(width/barcode.width())
 	vert_border_size = 0#barcode.quiet_zone * mod_width
 	barcode = barcode.image(height=height-(vert_border_size * 2), module_width=mod_width, add_quiet_zone=True)
-	
+
+	# second final pass, more precisely resize
+	bcode_w, bcode_h = barcode.size
+	barcode = barcode.resize((width, bcode_h), resample=Image.Resampling.NEAREST)
+
 	return barcode
 
 if args.barcode:
 	barcode = build_barcode(tag_data, config)
 	bcode_w, bcode_h = barcode.size
-	# barcode = barcode.resize((bg_w - (padding*2), bcode_h), resample=Image.Resampling.NEAREST)
-	# bcode_w, bcode_h = barcode.size
-
+	
 	# centered horizontally
 	bcode_x = (bg_w - bcode_w) // 2
 	#end vertically
