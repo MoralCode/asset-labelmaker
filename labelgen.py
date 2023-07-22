@@ -38,6 +38,8 @@ parser.add_argument('--qr', action="store_true",
                     help='whether or not to include a QR code in the generated label')
 parser.add_argument('--barcode', action="store_true",
                     help='whether or not to include a Code128B barcode in the generated label')
+parser.add_argument('--assetTag',
+                    help='data to write to the codes (if different from the label)')
 parser.add_argument('--label',
                     help='Text to write on the label')
 parser.add_argument('--configpath', default="config.ini",
@@ -59,6 +61,8 @@ bg_w, bg_h = background.size
 # padding = int(.025*config.getInteger("LabelWidth"))
 padding = config.getInteger("LabelPadding")
 
+tag_data = args.asset_tag or args.label
+
 # build QR:
 
 def build_qr(asset_tag, config):
@@ -71,7 +75,7 @@ def build_qr(asset_tag, config):
 
 
 if args.qr:
-	qr = build_qr(args.label, config)
+	qr = build_qr(tag_data, config)
 	qr_w, qr_h = qr.size
 
 	# centered horizontally
@@ -102,7 +106,7 @@ def build_barcode(asset_tag, config):
 	return barcode
 
 if args.barcode:
-	barcode = build_barcode(args.label, config)
+	barcode = build_barcode(tag_data, config)
 	bcode_w, bcode_h = barcode.size
 	# barcode = barcode.resize((bg_w - (padding*2), bcode_h), resample=Image.Resampling.NEAREST)
 	# bcode_w, bcode_h = barcode.size
