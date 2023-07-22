@@ -38,7 +38,7 @@ parser.add_argument('--qr', action="store_true",
                     help='whether or not to include a QR code in the generated label')
 parser.add_argument('--barcode', action="store_true",
                     help='whether or not to include a Code128B barcode in the generated label')
-parser.add_argument('--assetTag',
+parser.add_argument('--asset-tag',
                     help='data to write to the codes (if different from the label)')
 parser.add_argument('--label',
                     help='Text to write on the label')
