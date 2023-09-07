@@ -42,6 +42,8 @@ parser.add_argument('--asset-tag',
                     help='data to write to the codes (if different from the label)')
 parser.add_argument('--label',
                     help='Text to write on the label')
+parser.add_argument('--propertylabel',
+                    help='Text to write on the "property of" portion of the label (if present)')
 parser.add_argument('--configpath', default="config.ini",
                     help='path to config ini file')		
 parser.add_argument('--configsection', default="default",
@@ -182,12 +184,13 @@ class Label():
 
 
 		if self.config.getString("PropertyLabelText") != "":
+			textcontents = args.propertylabel or self.config.getString("PropertyLabelText")
 			draw = ImageDraw.Draw(background)
 
 			propertyfont = ImageFont.truetype(self.config.getString("PropertyLabelFont"), self.config.getInteger("PropertyLabelFontSize"))
-			prop_alpha_w, prop_alpha_h = draw.textsize(self.config.getString("PropertyLabelText"),font=propertyfont)
+			prop_alpha_w, prop_alpha_h = draw.textsize(textcontents,font=propertyfont)
 
-			draw.text((int((bg_w - prop_alpha_w)/2 + self.config.getInteger("PropertyLabelHorizontalOffsetFromCenter")), self.config.getInteger("PropertyLabelVerticalPosition")), self.config.getString("PropertyLabelText"), fill="black",font=propertyfont)
+			draw.text((int((bg_w - prop_alpha_w)/2 + self.config.getInteger("PropertyLabelHorizontalOffsetFromCenter")), self.config.getInteger("PropertyLabelVerticalPosition")), textcontents, fill="black",font=propertyfont)
 		self.background = background
 	
 	def save(self, path):
