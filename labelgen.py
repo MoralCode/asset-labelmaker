@@ -149,7 +149,8 @@ class Label():
 
 		
 		# num_w, num_h = draw.textsize(lines[0],font=numfont)
-
+		start_w = self.config.getInteger("HumanLabelHorizontalOffset") 
+		start_h = self.config.getInteger("HumanLabelVerticalOffset")
 
 		if self.has_qr:
 			qr_x_offset = 0
@@ -162,8 +163,8 @@ class Label():
 				qr_x_offset = qr_x
 				qr_y_offset = qr_h + qr_y
 
-			start_w = qr_x_offset + self.config.getInteger("HumanLabelHorizontalOffset") 
-			start_h = qr_y_offset + self.config.getInteger("HumanLabelVerticalOffset") #+ int(padding/2)#+ qr_y
+			start_w += qr_x_offset 
+			start_h += qr_y_offset #+ int(padding/2)#+ qr_y
 			#int((bg_h-bcode_h-padding-alpha_h-num_h)/2)
 		# draw text
 		alpha_w, alpha_h = draw.textsize(lines[0],font=alphafont)
