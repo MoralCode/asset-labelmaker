@@ -33,7 +33,7 @@ function make_hrm {
 	# $2 - style
 	# $3 - property label
 
-	pipenv run python3 ./labelgen.py --label "$PREFIX$1" --barcode --propertylabel "$3" --configsection "$2" --output "$OUTPUTDIR$PREFIX$1.png"
+	pipenv run python3 ./labelgen.py --label "$PREFIX$1" --barcode --qr --propertylabel "$3" --configsection "$2" --output "$OUTPUTDIR$PREFIX$1.png"
 }
 
 
