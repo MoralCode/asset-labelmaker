@@ -42,6 +42,10 @@ parser.add_argument('--asset-tag',
                     help='data to write to the codes (if different from the label)')
 parser.add_argument('--label',
                     help='Text to write on the label')
+parser.add_argument('--propertylabel',
+                    help='Text to write on the "property of" portion of the label (if present)')
+parser.add_argument('--auxlabel',
+                    help='Auxiliary label text to add as a separate label (if present)')
 parser.add_argument('--configpath', default="config.ini",
                     help='path to config ini file')		
 parser.add_argument('--configsection', default="default",
@@ -104,8 +108,6 @@ class Label():
 		if self.has_qr:
 			qr = self._build_qr(self.asset_tag, self.config, bg_h)
 			qr_w, qr_h = qr.size
-			print(qr)
-
 			# centered horizontally
 			# x = (bg_w - qr_w) // 2
 			#centered vertically
@@ -147,7 +149,8 @@ class Label():
 
 		
 		# num_w, num_h = draw.textsize(lines[0],font=numfont)
-
+		start_w = self.config.getInteger("HumanLabelHorizontalOffset") 
+		start_h = self.config.getInteger("HumanLabelVerticalOffset")
 
 		if self.has_qr:
 			qr_x_offset = 0
@@ -160,14 +163,19 @@ class Label():
 				qr_x_offset = qr_x
 				qr_y_offset = qr_h + qr_y
 
-			start_w = qr_x_offset + self.config.getInteger("HumanLabelHorizontalOffset") 
-			start_h = qr_y_offset + self.config.getInteger("HumanLabelVerticalOffset") #+ int(padding/2)#+ qr_y
+			# this was messing with the quarter labels for HRMs
+			start_w += qr_x_offset 
+			start_h += qr_y_offset #+ int(padding/2)#+ qr_y
 			#int((bg_h-bcode_h-padding-alpha_h-num_h)/2)
 		# draw text
-		alpha_w, alpha_h = draw.textsize(lines[0],font=alphafont)
+		textpos = (start_w, start_h)
+		# TODO: migrate to new, cleaner text alignment methods
+		# https://pillow.readthedocs.io/en/stable/reference/ImageDraw.html#PIL.ImageDraw.ImageDraw.textbbox
+		textl, textt, textr, textb = draw.textbbox(textpos, lines[0],font=alphafont)
+		alpha_w, alpha_h = (textr-textl), (textb-textt)
 		
 		print(alpha_h)
-		draw.text((start_w, start_h), lines[0], fill="black",font=alphafont)
+		draw.text(textpos, lines[0], fill="black",font=alphafont)
 
 		# draw number
 		labelnumoffset = (start_w, start_h)
@@ -180,14 +188,34 @@ class Label():
 
 		draw.text(labelnumoffset, lines[1], fill="black",font=numfont)
 
-
-		if self.config.getString("PropertyLabelText") != "":
+		textcontents = args.propertylabel or self.config.getString("PropertyLabelText")
+		if textcontents != "":
 			draw = ImageDraw.Draw(background)
 
 			propertyfont = ImageFont.truetype(self.config.getString("PropertyLabelFont"), self.config.getInteger("PropertyLabelFontSize"))
-			prop_alpha_w, prop_alpha_h = draw.textsize(self.config.getString("PropertyLabelText"),font=propertyfont)
 
-			draw.text((int((bg_w - prop_alpha_w)/2 + self.config.getInteger("PropertyLabelHorizontalOffsetFromCenter")), self.config.getInteger("PropertyLabelVerticalPosition")), self.config.getString("PropertyLabelText"), fill="black",font=propertyfont)
+			textpos = (int(bg_w/2) + self.config.getInteger("PropertyLabelHorizontalOffsetFromCenter"), self.config.getInteger("PropertyLabelVerticalPosition"))
+
+
+			# prop_alpha_w, prop_alpha_h = draw.textsize(textcontents,anchor="ms", font=propertyfont)
+			draw.text(textpos, textcontents, anchor="ms", fill="black",font=propertyfont)
+
+			# manual override to also add the property of label because theres vertical space now
+			po_x, po_y = textpos
+
+		# aux label
+	# AuxLabelVerticalPosition=190
+	# AuxLabelHorizontalOffsetFromCenter=100
+	# AuxLabelFont=/usr/share/fonts/truetype/liberation/LiberationMono-Bold.ttf
+	# AuxLabelFontSize=42
+		textcontents = args.auxlabel or self.config.getString("AuxLabelText")
+		if textcontents != "":
+
+			textpos = (int(bg_w/2) + self.config.getInteger("AuxLabelHorizontalOffsetFromCenter"), self.config.getInteger("AuxLabelVerticalPosition"))
+
+			draw.text(textpos, textcontents, anchor="ms", fill="black",font=ImageFont.truetype(self.config.getString("AuxLabelFont"), int(self.config.getInteger("AuxLabelFontSize"))))
+			
+
 		self.background = background
 	
 	def save(self, path):
