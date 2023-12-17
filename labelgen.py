@@ -108,8 +108,6 @@ class Label():
 		if self.has_qr:
 			qr = self._build_qr(self.asset_tag, self.config, bg_h)
 			qr_w, qr_h = qr.size
-			print(qr)
-
 			# centered horizontally
 			# x = (bg_w - qr_w) // 2
 			#centered vertically
