@@ -164,8 +164,8 @@ class Label():
 				qr_y_offset = qr_h + qr_y
 
 			# this was messing with the quarter labels for HRMs
-			# start_w += qr_x_offset 
-			# start_h += qr_y_offset #+ int(padding/2)#+ qr_y
+			start_w += qr_x_offset 
+			start_h += qr_y_offset #+ int(padding/2)#+ qr_y
 			#int((bg_h-bcode_h-padding-alpha_h-num_h)/2)
 		# draw text
 		textpos = (start_w, start_h)
