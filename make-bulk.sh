@@ -117,4 +117,7 @@ else
 	make_batch 0001 0001 Full 5 "$OUTPUTDIR"
 	PREFIX="MON"
 	make_batch 0001 0001 Half 5 "$OUTPUTDIR"
+
+	cd "$OUTPUTDIR"
+	sha256sum * > hashes.sha256.txt
 fi
