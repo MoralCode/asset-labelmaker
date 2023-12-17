@@ -109,6 +109,7 @@ else
 	git stash
 
 	OUTPUTDIR="test/"
+	ARCHIVEDIR="testarchives/"
 	GITHASH=$(git rev-parse --short HEAD)
 
 	mkdir -p "$OUTPUTDIR"
@@ -121,7 +122,13 @@ else
 	PREFIX="MON"
 	make_batch 0001 0001 Half 5 "$OUTPUTDIR"
 
+	OGDIR=$(pwd)
 	cd "$OUTPUTDIR"
-	sha256sum * > hashes-${GITHASH}.sha256.txt
-	mv "$OUTPUTDIR" "$GITHASH"
+	sha256sum *.png > hashes-${GITHASH}.sha256.txt
+	cd "$OGDIR"
+
+	
+	mkdir -p "${ARCHIVEDIR}${GITHASH}"
+	# http://unix.stackexchange.com/questions/180985/ddg#180987
+	cp -r "${OUTPUTDIR}." "${ARCHIVEDIR}${GITHASH}"
 fi
