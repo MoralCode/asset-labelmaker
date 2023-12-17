@@ -199,6 +199,14 @@ class Label():
 
 			# prop_alpha_w, prop_alpha_h = draw.textsize(textcontents,anchor="ms", font=propertyfont)
 			draw.text(textpos, textcontents, anchor="ms", fill="black",font=propertyfont)
+
+			# manual override to also add the property of label because theres vertical space now
+			po_x, po_y = textpos
+
+			# property of
+			draw.text((po_x-100, po_y+50), self.config.getString("PropertyLabelText"), anchor="ms", fill="black",font=ImageFont.truetype(self.config.getString("PropertyLabelFont"), int(self.config.getInteger("PropertyLabelFontSize")-15)))
+			
+
 		self.background = background
 	
 	def save(self, path):
