@@ -188,9 +188,8 @@ class Label():
 
 		draw.text(labelnumoffset, lines[1], fill="black",font=numfont)
 
-
-		if self.config.getString("PropertyLabelText") != "":
-			textcontents = args.propertylabel or self.config.getString("PropertyLabelText")
+		textcontents = args.propertylabel or self.config.getString("PropertyLabelText")
+		if textcontents != "":
 			draw = ImageDraw.Draw(background)
 
 			propertyfont = ImageFont.truetype(self.config.getString("PropertyLabelFont"), self.config.getInteger("PropertyLabelFontSize"))
