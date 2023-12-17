@@ -22,3 +22,9 @@ If you want to make a ton of labels at once, this bash script can help - its lit
 The only fanciness is that it loops in batches to take advantage of some amount of system parallelism to generate labels a bunch faster without slamming the system with too many labels at once. 
 
 You should only need to edit the last line for the most part
+
+**Testing Mode**
+
+The script also contains a testing mode to generate one of each style kind of label to serve as a quick glance/way to generate comparison information to ensure that nothing gets broken as changes are made in future.
+
+to use it, simply supply an argument to the script, such as `./make_bulk.sh true`
