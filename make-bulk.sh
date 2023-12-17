@@ -106,7 +106,10 @@ else
 	# testing mode 
 	echo "testing mode"
 
+	git stash
+
 	OUTPUTDIR="${OUTPUTDIR}test/"
+	GITHASH=$(git rev-parse --short HEAD)
 
 	mkdir -p "$OUTPUTDIR"
 
@@ -119,5 +122,6 @@ else
 	make_batch 0001 0001 Half 5 "$OUTPUTDIR"
 
 	cd "$OUTPUTDIR"
-	sha256sum * > hashes.sha256.txt
+	sha256sum * > hashes-${GITHASH}.sha256.txt
+	mv "$OUTPUTDIR" "$GITHASH"
 fi
