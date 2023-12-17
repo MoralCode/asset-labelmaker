@@ -44,6 +44,8 @@ parser.add_argument('--label',
                     help='Text to write on the label')
 parser.add_argument('--propertylabel',
                     help='Text to write on the "property of" portion of the label (if present)')
+parser.add_argument('--auxlabel',
+                    help='Auxiliary label text to add as a separate label (if present)')
 parser.add_argument('--configpath', default="config.ini",
                     help='path to config ini file')		
 parser.add_argument('--configsection', default="default",
@@ -203,8 +205,17 @@ class Label():
 			# manual override to also add the property of label because theres vertical space now
 			po_x, po_y = textpos
 
-			# property of
-			draw.text((po_x-100, po_y+50), self.config.getString("PropertyLabelText"), anchor="ms", fill="black",font=ImageFont.truetype(self.config.getString("PropertyLabelFont"), int(self.config.getInteger("PropertyLabelFontSize")-15)))
+		# aux label
+	# AuxLabelVerticalPosition=190
+	# AuxLabelHorizontalOffsetFromCenter=100
+	# AuxLabelFont=/usr/share/fonts/truetype/liberation/LiberationMono-Bold.ttf
+	# AuxLabelFontSize=42
+		textcontents = args.auxlabel or self.config.getString("AuxLabelText")
+		if textcontents != "":
+
+			textpos = (int(bg_w/2) + self.config.getInteger("AuxLabelHorizontalOffsetFromCenter"), self.config.getInteger("AuxLabelVerticalPosition"))
+
+			draw.text(textpos, textcontents, anchor="ms", fill="black",font=ImageFont.truetype(self.config.getString("AuxLabelFont"), int(self.config.getInteger("AuxLabelFontSize")-15)))
 			
 
 		self.background = background
