@@ -108,7 +108,7 @@ else
 
 	git stash
 
-	OUTPUTDIR="${OUTPUTDIR}test/"
+	OUTPUTDIR="test/"
 	GITHASH=$(git rev-parse --short HEAD)
 
 	mkdir -p "$OUTPUTDIR"
