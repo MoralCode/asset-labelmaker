@@ -215,7 +215,7 @@ class Label():
 
 			textpos = (int(bg_w/2) + self.config.getInteger("AuxLabelHorizontalOffsetFromCenter"), self.config.getInteger("AuxLabelVerticalPosition"))
 
-			draw.text(textpos, textcontents, anchor="ms", fill="black",font=ImageFont.truetype(self.config.getString("AuxLabelFont"), int(self.config.getInteger("AuxLabelFontSize")-15)))
+			draw.text(textpos, textcontents, anchor="ms", fill="black",font=ImageFont.truetype(self.config.getString("AuxLabelFont"), int(self.config.getInteger("AuxLabelFontSize"))))
 			
 
 		self.background = background
