@@ -137,16 +137,20 @@ class Label():
 		
 		height = config.getInteger("BarcodeHeight")
 		width = config.getInteger("LabelWidth") - (2* config.getInteger("BarcodeSidePadding"))
-		barcode = Code128(asset_tag, charset='B')
-		barcode.quiet_zone = 1 #num of modules
-		# first  rough pass, try to get close to the right size
-		mod_width = int(width/barcode.width())
-		vert_border_size = 0#barcode.quiet_zone * mod_width
-		barcode = barcode.image(height=height-(vert_border_size * 2), module_width=mod_width, add_quiet_zone=True)
 
-		# second final pass, more precisely resize
-		bcode_w, bcode_h = barcode.size
-		barcode = barcode.resize((width, bcode_h), resample=Image.Resampling.NEAREST)
+		if config.getString("BarcodeSymbology").lower() == "code39":
+			barcode = code39(filepath=".", text=asset_tag, size=height, orientation="horizontal", printText=True, sizeFactor=6)
+		else:
+			barcode = Code128(asset_tag, charset='B')
+			barcode.quiet_zone = 1 #num of modules
+			# first  rough pass, try to get close to the right size
+			mod_width = int(width/barcode.width())
+			vert_border_size = 0#barcode.quiet_zone * mod_width
+			barcode = barcode.image(height=height-(vert_border_size * 2), module_width=mod_width, add_quiet_zone=True)
+
+			# second final pass, more precisely resize
+			bcode_w, bcode_h = barcode.size
+			barcode = barcode.resize((width, bcode_h), resample=Image.Resampling.NEAREST)
 
 		return barcode
 
