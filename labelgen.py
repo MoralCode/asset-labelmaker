@@ -9,6 +9,57 @@ from pubcode import Code128
 # Generate a single asset label for an erg given a path to a QR code and barcode
 
 
+def code39(filepath=".", text="", size=200, orientation="horizontal", printText=False, sizeFactor=8):
+  code_dict = {"0":"111221211","1":"211211112","2":"112211112","3":"212211111","4":"111221112","5":"211221111","6":"112221111","7":"111211212","8":"211211211","9":"112211211","A":"211112112","B":"112112112","C":"212112111","D":"111122112","E":"211122111","F":"112122111","G":"111112212","H":"211112211","I":"112112211","J":"111122211","K":"211111122","L":"112111122","M":"212111121","N":"111121122","O":"211121121","P":"112121121","Q":"111111222","R":"211111221","S":"112111221","T":"111121221","U":"221111112","V":"122111112","W":"222111111","X":"121121112","Y":"221121111","Z":"122121111","-":"121111212",".":"221111211"," ":"122111211","$":"121212111","/":"121211121","+":"121112121","%":"111212121","*":"121121211"}
+  upper_text = text.upper()
+  code_string = ''.join([code_dict[c] + "1" for c in upper_text])
+  code_string = "1211212111" + code_string + "121121211"
+
+  padding = 5
+
+  code_length = padding * 2
+# temporary
+  im = Image.new("L",(500,500),255)
+  draw = ImageDraw.Draw(im)
+
+  font = ImageFont.truetype("/usr/share/fonts/truetype/liberation/LiberationSans-Bold.ttf", 12 * sizeFactor)
+  textl, textt, textr, textb = draw.textbbox((0,0), upper_text,font=font)
+  alpha_w, alpha_h = (textr-textl), (textb-textt)
+  text_height = alpha_h + 20 if printText else 0
+
+  code_length += sum([int(e) for e in code_string])
+
+  width = 0
+  height = 0
+  if(orientation == "horizontal"):
+    width = code_length * sizeFactor
+    height = size
+  else:
+    height = code_length * sizeFactor
+    width = size
+
+  im = Image.new("L",(width,height + text_height),255)
+  draw = ImageDraw.Draw(im)
+  
+  if(printText):
+    #font = ImageFont.truetype("Arial.ttf", 12 * sizeFactor)
+    textPosition = (width - alpha_w) // 2
+    draw.text((textPosition,height),upper_text,0,font)
+
+  loc = padding
+  for i,e in enumerate([int(e) for e in code_string]):
+    cur_size = loc  + e
+    if(orientation == "horizontal"):
+      draw.rectangle([loc*sizeFactor,0,cur_size*sizeFactor,height], 0 if (i %2 == 0) else 255)
+    else:
+      draw.rectangle([0,loc*sizeFactor,width,cur_size*sizeFactor], 0 if (i %2 == 0) else 255)
+    loc = cur_size
+  del(draw)
+  # im = im.rotate(90,expand=True).resize(((height+text_height),width),Image.LANCZOS)
+  return im
+  # im.save(filepath + "/" + text +".png")
+
+
 # https://stackoverflow.com/a/430665/
 def splitAlphaAndNumeric(s):
     head = s.rstrip('0123456789')
