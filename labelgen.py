@@ -15,7 +15,7 @@ def code39(filepath=".", text="", size=200, orientation="horizontal", printText=
   code_string = ''.join([code_dict[c] + "1" for c in upper_text])
   code_string = "1211212111" + code_string + "121121211"
 
-  padding = 5
+  padding = 10
 
   code_length = padding * 2
 # temporary
